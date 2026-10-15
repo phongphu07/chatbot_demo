@@ -181,7 +181,7 @@
           </button>
           <textarea 
             id="chatInput" 
-            placeholder="Nhập câu hỏi hoặc yêu cầu cần hỗ trợ..." 
+            placeholder="Hỏi bất kỳ điều gì..." 
             rows="1"
           ></textarea>
           <button type="button" class="stop-btn" id="stopBtn" title="Dừng sinh phản hồi">
@@ -237,18 +237,18 @@
       <div class="modal-body admin-body">
         <!-- TAB 1: KHO TRI THỨC (UNIFIED UPLOAD + DOCS LIST) -->
         <div class="admin-pane active" id="tabKnowledge">
-          <!-- QUICK SAMPLE DATA INGESTION -->
+          <!-- QUICK SAMPLE DATA INGESTION (CONCISE & COMPACT) -->
           <div class="sample-data-card">
             <div class="sample-data-info">
               <i data-lucide="sparkles" class="sample-icon"></i>
               <div>
-                <h4>Nạp nhanh bộ dữ liệu mẫu (Quy chế công ty 2024)</h4>
-                <p>Nạp sẵn chính sách làm việc từ xa (WFH), bảo hiểm PTI Care 150tr, trợ cấp thiết bị 5.000.000 VNĐ và SLA kỹ thuật.</p>
+                <h4>Dữ liệu mẫu: Quy chế công ty</h4>
+                <p>Nạp sẵn chính sách WFH, bảo hiểm & trợ cấp để thử nghiệm RAG.</p>
               </div>
             </div>
             <button class="btn-sample" id="ingestSampleBtn" type="button">
-              <i data-lucide="database" style="width: 15px; height: 15px;"></i>
-              <span>Nạp dữ liệu mẫu</span>
+              <i data-lucide="database" style="width: 14px; height: 14px;"></i>
+              <span>Nạp mẫu</span>
             </button>
           </div>
 
@@ -310,46 +310,33 @@
           </div>
         </div>
 
-        <!-- TAB 2: TICKETS MANAGEMENT -->
+        <!-- TAB 2: TICKETS MANAGEMENT (MOBILE-FIRST CARDS) -->
         <div class="admin-pane" id="tabTickets">
           <div class="section-card-header">
             <div>
-              <h4>Danh sách phiếu yêu cầu hỗ trợ (Support Tickets)</h4>
-              <p>Phiếu sự cố được ghi nhận và phân loại tự động bởi AI Agent qua hội thoại</p>
+              <h4>Phiếu yêu cầu hỗ trợ</h4>
+              <p>Sự cố được AI ghi nhận và phân loại tự động</p>
             </div>
             <button class="btn btn-secondary btn-sm" id="refreshTicketsBtn">
-              <i data-lucide="rotate-cw" style="width: 14px; height: 14px;"></i>
+              <i data-lucide="rotate-cw" style="width: 13px; height: 13px;"></i>
               <span>Làm mới</span>
             </button>
           </div>
-          <div class="tickets-table-wrap">
-            <table class="tickets-table">
-              <thead>
-                <tr>
-                  <th style="width: 110px;">Mã phiếu</th>
-                  <th>Tiêu đề yêu cầu</th>
-                  <th style="width: 120px;">Mức độ</th>
-                  <th style="width: 130px;">Trạng thái</th>
-                  <th style="width: 150px;">Thời gian tạo</th>
-                </tr>
-              </thead>
-              <tbody id="ticketsList">
-                <tr>
-                  <td colspan="5" style="text-align:center; padding: 32px; color: var(--text-muted);">
-                    Chưa có phiếu hỗ trợ nào. Thử nhắn cho AI: <i>"Tạo giúp tôi phiếu hỗ trợ sự cố máy chủ mức Khẩn cấp"</i>.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="tickets-cards-list" id="ticketsList">
+            <div class="empty-state-ticket">
+              <i data-lucide="ticket" style="width: 28px; height: 28px; color: var(--text-sub);"></i>
+              <h5>Chưa có phiếu hỗ trợ nào</h5>
+              <p>Thử nhắn cho trợ lý AI: <i>"Tạo phiếu hỗ trợ: Lỗi mạng văn phòng mức Khẩn cấp"</i></p>
+            </div>
           </div>
         </div>
 
         <!-- TAB 3: TOOLS REGISTRY -->
         <div class="admin-pane" id="tabTools">
-          <div class="section-card-header">
-            <div>
-              <h4>Bộ công cụ tự động của AI Agent (Function Calling)</h4>
-              <p>Các năng lực trợ lý tự động nhận diện ý định và kích hoạt trong thời gian thực</p>
+          <div class="section-card-header tools-header">
+            <div class="tools-header-left">
+              <h4>Kỹ năng tự động (Function Calling)</h4>
+              <p>AI tự nhận diện ý định và kích hoạt khi cần</p>
             </div>
             <span class="active-tools-pill">
               <span class="pulse-dot-sm"></span> 5 công cụ sẵn sàng
@@ -422,44 +409,44 @@
         <!-- TAB 4: AI ACCURACY BENCHMARK & EVALUATION -->
         <div class="admin-pane" id="tabBenchmark">
           <div class="benchmark-header">
-            <div>
-              <h4>Đánh giá độ chính xác AI (14 Ca kiểm thử chuyên sâu)</h4>
-              <p>Kiểm thử tự động End-to-End: Truy vấn pgvector, gọi Tools, so khớp dữ kiện và đo lường chống ảo giác.</p>
+            <div class="benchmark-header-left">
+              <h4>Đánh giá chất lượng AI</h4>
+              <p>14 bài kiểm tra độ chính xác RAG, Tools & Chống ảo giác</p>
             </div>
-            <button class="btn btn-primary" id="runBenchmarkBtn">
-              <i data-lucide="play" style="width: 15px; height: 15px;"></i>
-              <span>Chạy lại kiểm thử</span>
+            <button class="btn btn-primary" id="runBenchmarkBtn" type="button">
+              <i data-lucide="play" style="width: 14px; height: 14px;"></i>
+              <span>Chạy kiểm thử</span>
             </button>
           </div>
 
-          <!-- 4 METRIC CARDS -->
+          <!-- 4 METRIC CARDS (2x2 GRID ON MOBILE) -->
           <div class="benchmark-stats-grid">
             <div class="bm-stat-card">
-              <span class="bm-stat-label">Độ chính xác (Accuracy)</span>
+              <span class="bm-stat-label">Độ chính xác</span>
               <div class="bm-stat-val text-emerald" id="bmAccuracy">100%</div>
               <span class="bm-stat-sub" id="bmPassedCount">14 / 14 ca ĐẠT</span>
             </div>
             <div class="bm-stat-card">
-              <span class="bm-stat-label">Chống ảo giác (Faithfulness)</span>
+              <span class="bm-stat-label">Chống ảo giác</span>
               <div class="bm-stat-val text-cyan" id="bmFaithfulness">100%</div>
-              <span class="bm-stat-sub">Không bịa đặt thông tin</span>
+              <span class="bm-stat-sub">Trích xuất chuẩn xác</span>
             </div>
             <div class="bm-stat-card">
-              <span class="bm-stat-label">Độ trễ TB (Latency)</span>
+              <span class="bm-stat-label">Độ trễ trung bình</span>
               <div class="bm-stat-val text-purple" id="bmLatency">4.7s</div>
-              <span class="bm-stat-sub">Suy luận & RAG song song</span>
+              <span class="bm-stat-sub">RAG & Tool song song</span>
             </div>
             <div class="bm-stat-card">
-              <span class="bm-stat-label">Thời điểm chạy</span>
-              <div class="bm-stat-val text-amber" id="bmLastRun" style="font-size: 0.92rem; line-height: 1.8;">Vừa xong</div>
-              <span class="bm-stat-sub">Chấm điểm tự động</span>
+              <span class="bm-stat-label">Lần chạy gần nhất</span>
+              <div class="bm-stat-val text-amber" id="bmLastRun" style="font-size: 0.95rem; line-height: 1.6;">Vừa xong</div>
+              <span class="bm-stat-sub">Đo lường tự động</span>
             </div>
           </div>
 
           <!-- DETAILED TEST CASES LIST -->
           <div class="benchmark-results-wrap">
             <div class="benchmark-results-list" id="benchmarkResultsList">
-              <div class="empty-state">Đang tải kết quả kiểm thử gần nhất...</div>
+              <div class="empty-state">Chưa có kết quả kiểm thử. Nhấn "Chạy kiểm thử" ở trên để đo lường tự động.</div>
             </div>
           </div>
         </div>
@@ -468,7 +455,8 @@
       <div class="modal-footer compact">
         <div class="modal-footer-status">
           <span class="status-indicator-dot"></span>
-          <span>pgvector • HNSW Index Active • Google Gemini 2.5 Flash</span>
+          <span class="status-base-text">pgvector • HNSW Active</span>
+          <span class="status-extra-text">• Gemini 2.5 Flash</span>
         </div>
         <button class="btn btn-secondary btn-sm" id="closeAdminHubFooterBtn">Đóng</button>
       </div>
@@ -512,12 +500,53 @@
       </div>
       <div class="modal-body">
         <form id="settingsForm">
-          <div class="form-group">
+          <div class="form-group form-group-dropdown">
             <label for="selectProvider">Nhà cung cấp Mô hình AI:</label>
-            <select id="selectProvider" class="form-control">
+            <select id="selectProvider" class="form-control visually-hidden-select">
               <option value="gemini">Google Gemini (Khuyên dùng - Nhanh & Mượt mà)</option>
               <option value="openai">OpenAI (GPT-4o / GPT-4o-mini)</option>
             </select>
+            <!-- CUSTOM DROPDOWN FOR PROVIDER -->
+            <div class="custom-select-wrapper" id="customSelectProvider" data-target="selectProvider">
+              <div class="custom-select-trigger" tabindex="0">
+                <div class="custom-select-left">
+                  <i data-lucide="sparkles" class="select-icon icon-gemini"></i>
+                  <span class="custom-select-text">Google Gemini (Khuyên dùng - Nhanh & Mượt mà)</span>
+                </div>
+                <i data-lucide="chevron-down" class="custom-select-arrow"></i>
+              </div>
+              <div class="custom-select-menu">
+                <div class="custom-select-item active" data-value="gemini">
+                  <div class="item-left">
+                    <div class="item-icon-box icon-gemini">
+                      <i data-lucide="sparkles"></i>
+                    </div>
+                    <div class="item-info">
+                      <div class="item-title">
+                        <span>Google Gemini</span>
+                        <span class="item-badge-rec">Khuyên dùng</span>
+                      </div>
+                      <div class="item-desc">Tốc độ cao, suy luận mượt mà & miễn phí API</div>
+                    </div>
+                  </div>
+                  <i data-lucide="check" class="item-check"></i>
+                </div>
+                <div class="custom-select-item" data-value="openai">
+                  <div class="item-left">
+                    <div class="item-icon-box icon-openai">
+                      <i data-lucide="cpu"></i>
+                    </div>
+                    <div class="item-info">
+                      <div class="item-title">
+                        <span>OpenAI</span>
+                      </div>
+                      <div class="item-desc">GPT-4o / GPT-4o-mini (Cần API Key trả phí)</div>
+                    </div>
+                  </div>
+                  <i data-lucide="check" class="item-check"></i>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="form-group" id="geminiKeyGroup">
             <label for="geminiKeyInput">Khóa API Google Gemini:</label>
@@ -528,13 +557,68 @@
             <label for="openaiKeyInput">Khóa API OpenAI:</label>
             <input type="password" id="openaiKeyInput" class="form-control" placeholder="sk-...">
           </div>
-          <div class="form-group">
+          <div class="form-group form-group-dropdown">
             <label for="selectEmbedding">Mô hình Tạo Vector (Embedding):</label>
-            <select id="selectEmbedding" class="form-control">
+            <select id="selectEmbedding" class="form-control visually-hidden-select">
               <option value="gemini">Google gemini-embedding-001</option>
               <option value="openai">OpenAI text-embedding-3-small</option>
               <option value="local">Local Offline (all-MiniLM-L6-v2)</option>
             </select>
+            <!-- CUSTOM DROPDOWN FOR EMBEDDING -->
+            <div class="custom-select-wrapper" id="customSelectEmbedding" data-target="selectEmbedding">
+              <div class="custom-select-trigger" tabindex="0">
+                <div class="custom-select-left">
+                  <i data-lucide="sparkles" class="select-icon icon-gemini"></i>
+                  <span class="custom-select-text">Google gemini-embedding-001</span>
+                </div>
+                <i data-lucide="chevron-down" class="custom-select-arrow"></i>
+              </div>
+              <div class="custom-select-menu">
+                <div class="custom-select-item active" data-value="gemini">
+                  <div class="item-left">
+                    <div class="item-icon-box icon-gemini">
+                      <i data-lucide="sparkles"></i>
+                    </div>
+                    <div class="item-info">
+                      <div class="item-title">
+                        <span>Google gemini-embedding-001</span>
+                        <span class="item-badge-rec">Tối ưu</span>
+                      </div>
+                      <div class="item-desc">Tương thích hoàn hảo với Gemini 2.5 Flash</div>
+                    </div>
+                  </div>
+                  <i data-lucide="check" class="item-check"></i>
+                </div>
+                <div class="custom-select-item" data-value="openai">
+                  <div class="item-left">
+                    <div class="item-icon-box icon-openai">
+                      <i data-lucide="cpu"></i>
+                    </div>
+                    <div class="item-info">
+                      <div class="item-title">
+                        <span>OpenAI text-embedding-3-small</span>
+                      </div>
+                      <div class="item-desc">Vector 1536 chiều, độ chính xác cao</div>
+                    </div>
+                  </div>
+                  <i data-lucide="check" class="item-check"></i>
+                </div>
+                <div class="custom-select-item" data-value="local">
+                  <div class="item-left">
+                    <div class="item-icon-box icon-local">
+                      <i data-lucide="hard-drive"></i>
+                    </div>
+                    <div class="item-info">
+                      <div class="item-title">
+                        <span>Local Offline (all-MiniLM-L6-v2)</span>
+                      </div>
+                      <div class="item-desc">Chạy nội bộ CPU máy chủ, hoàn toàn offline</div>
+                    </div>
+                  </div>
+                  <i data-lucide="check" class="item-check"></i>
+                </div>
+              </div>
+            </div>
           </div>
         </form>
       </div>

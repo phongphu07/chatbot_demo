@@ -373,12 +373,13 @@ function renderTicketsList(tickets) {
 
   if (tickets.length === 0) {
     ticketsList.innerHTML = `
-      <tr>
-        <td colspan="5" style="text-align:center; padding: 28px; color: var(--text-muted);">
-          Chưa có phiếu hỗ trợ nào. Hãy thử nhắn với trợ lý: <i>"Tạo phiếu hỗ trợ: Lỗi mạng nội bộ, mức độ Khẩn cấp"</i>
-        </td>
-      </tr>
+      <div class="empty-state-ticket">
+        <i data-lucide="ticket" style="width: 28px; height: 28px; color: var(--text-sub);"></i>
+        <h5>Chưa có phiếu hỗ trợ nào</h5>
+        <p>Thử nhắn cho trợ lý AI: <i>"Tạo phiếu hỗ trợ: Lỗi mạng văn phòng mức Khẩn cấp"</i></p>
+      </div>
     `;
+    refreshIcons(ticketsList);
     return;
   }
 
@@ -389,18 +390,23 @@ function renderTicketsList(tickets) {
     else if (prioLower.includes("thấp")) priorityClass = "thap";
 
     return `
-      <tr>
-        <td><strong style="color:var(--primary); font-family: 'JetBrains Mono', monospace;">${escapeHtml(t.id)}</strong></td>
-        <td>
-          <div style="font-weight: 500;">${escapeHtml(t.title)}</div>
-          <div style="font-size: 0.74rem; color: var(--text-sub); margin-top: 2px;">${escapeHtml(t.description)}</div>
-        </td>
-        <td><span class="priority-badge ${priorityClass}">${escapeHtml(t.priority || 'Bình thường')}</span></td>
-        <td><span class="status-pill-ticket">${escapeHtml(t.status || 'Đang tiếp nhận')}</span></td>
-        <td style="color: var(--text-muted); font-size: 0.76rem;">${escapeHtml(t.created_at || '')}</td>
-      </tr>
+      <div class="ticket-card-item">
+        <div class="ticket-card-top">
+          <div class="ticket-card-id-title">
+            <span class="ticket-id">${escapeHtml(t.id)}</span>
+            <span class="ticket-title">${escapeHtml(t.title)}</span>
+          </div>
+          <span class="priority-badge ${priorityClass}">${escapeHtml(t.priority || 'Bình thường')}</span>
+        </div>
+        ${t.description ? `<p class="ticket-desc">${escapeHtml(t.description)}</p>` : ''}
+        <div class="ticket-card-footer">
+          <span class="status-pill-ticket"><span class="status-dot-sm"></span>${escapeHtml(t.status || 'Đang tiếp nhận')}</span>
+          <span class="ticket-time">${escapeHtml(t.created_at || '')}</span>
+        </div>
+      </div>
     `;
   }).join("");
+  refreshIcons(ticketsList);
 }
 
 // ========================================================
@@ -963,6 +969,7 @@ function initPresenceTracking() {
 // ========================================================
 function setupAdminHub() {
   const openHub = () => {
+    closeMobileSidebar();
     // 1. Mở popup tức thì, mượt mà không bị khựng
     adminHubModal.classList.add("active");
     // 2. Cập nhật ngầm dữ liệu tài liệu & ticket mà không gây lag hiệu ứng mở
@@ -1070,7 +1077,7 @@ function setupBenchmarkUI() {
     if (!resultsList) return;
 
     if (!data.results || data.results.length === 0) {
-      resultsList.innerHTML = `<div class="empty-state">Chưa có kết quả kiểm thử. Hãy nhấn nút "Bắt đầu kiểm thử" ở trên!</div>`;
+      resultsList.innerHTML = `<div class="empty-state">Chưa có kết quả kiểm thử. Nhấn "Chạy kiểm thử" ở trên để đo lường tự động.</div>`;
       return;
     }
 
@@ -1342,13 +1349,22 @@ function setupEventListeners() {
     }
   });
 
+  setupCustomSelects();
+
   openSettingsBtn.addEventListener("click", async () => {
+    closeMobileSidebar();
     try {
       const res = await fetch("/api/settings/status");
       if (res.ok) {
         const data = await res.json();
-        if (data.llm_provider) selectProvider.value = data.llm_provider;
-        if (data.embedding_provider) selectEmbedding.value = data.embedding_provider;
+        if (data.llm_provider) {
+          selectProvider.value = data.llm_provider;
+          selectProvider.dispatchEvent(new Event("change"));
+        }
+        if (data.embedding_provider) {
+          selectEmbedding.value = data.embedding_provider;
+          selectEmbedding.dispatchEvent(new Event("change"));
+        }
         if (data.has_gemini_key) {
           geminiKeyInput.placeholder = "•••••••••••••••••••• (Đã cấu hình sẵn)";
         } else {
@@ -1358,8 +1374,14 @@ function setupEventListeners() {
     } catch(e){}
     settingsModal.classList.add("active");
   });
-  closeSettingsBtn.addEventListener("click", () => settingsModal.classList.remove("active"));
-  cancelSettingsBtn.addEventListener("click", () => settingsModal.classList.remove("active"));
+  closeSettingsBtn.addEventListener("click", () => {
+    settingsModal.classList.remove("active");
+    document.querySelectorAll(".custom-select-wrapper").forEach(w => w.classList.remove("open"));
+  });
+  cancelSettingsBtn.addEventListener("click", () => {
+    settingsModal.classList.remove("active");
+    document.querySelectorAll(".custom-select-wrapper").forEach(w => w.classList.remove("open"));
+  });
 
   selectProvider.addEventListener("change", (e) => {
     if (e.target.value === "gemini") {
@@ -1401,6 +1423,92 @@ function setupEventListeners() {
       openaiKeyInput.value = "";
     } catch (err) {
       showToast("Lỗi lưu cấu hình: " + err.message, "error");
+    }
+  });
+}
+
+// ========================================================
+// CUSTOM ENTERPRISE SELECT DROPDOWN LOGIC
+// ========================================================
+function setupCustomSelects() {
+  const wrappers = document.querySelectorAll(".custom-select-wrapper");
+
+  wrappers.forEach(wrap => {
+    const targetId = wrap.dataset.target;
+    const targetSelect = document.getElementById(targetId);
+    if (!targetSelect) return;
+
+    const trigger = wrap.querySelector(".custom-select-trigger");
+    const textSpan = wrap.querySelector(".custom-select-text");
+    const iconEl = wrap.querySelector(".select-icon");
+    const items = wrap.querySelectorAll(".custom-select-item");
+
+    const syncFromTarget = () => {
+      const val = targetSelect.value;
+      items.forEach(item => {
+        if (item.dataset.value === val) {
+          item.classList.add("active");
+          const title = item.querySelector(".item-title span")?.textContent || item.querySelector(".item-title")?.textContent;
+          if (textSpan && title) textSpan.textContent = title.trim();
+
+          const iconBox = item.querySelector(".item-icon-box");
+          if (iconEl && iconBox) {
+            iconEl.className = "select-icon";
+            if (iconBox.classList.contains("icon-gemini")) iconEl.classList.add("icon-gemini");
+            else if (iconBox.classList.contains("icon-openai")) iconEl.classList.add("icon-openai");
+            else if (iconBox.classList.contains("icon-local")) iconEl.classList.add("icon-local");
+
+            const itemLucide = iconBox.querySelector("[data-lucide]")?.getAttribute("data-lucide");
+            if (itemLucide) iconEl.setAttribute("data-lucide", itemLucide);
+          }
+        } else {
+          item.classList.remove("active");
+        }
+      });
+      refreshIcons(wrap);
+    };
+
+    trigger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = wrap.classList.contains("open");
+      wrappers.forEach(w => w.classList.remove("open"));
+      if (!isOpen) {
+        wrap.classList.add("open");
+      }
+    });
+
+    trigger.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        trigger.click();
+      } else if (e.key === "Escape") {
+        wrap.classList.remove("open");
+      }
+    });
+
+    items.forEach(item => {
+      item.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const val = item.dataset.value;
+        targetSelect.value = val;
+        targetSelect.dispatchEvent(new Event("change", { bubbles: true }));
+        wrap.classList.remove("open");
+      });
+    });
+
+    targetSelect.addEventListener("change", syncFromTarget);
+    syncFromTarget();
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".custom-select-wrapper")) {
+      wrappers.forEach(w => w.classList.remove("open"));
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      wrappers.forEach(w => w.classList.remove("open"));
     }
   });
 }
