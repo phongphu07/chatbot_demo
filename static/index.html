@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trợ lý Thông minh | Hỗ trợ & Hỏi đáp Doanh nghiệp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Markdown & Code Highlight -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <!-- Lucide Professional Icons Library -->
+  <script src="/static/lucide.min.js"></script>
+  <link rel="stylesheet" href="/static/style.css?v=4.1">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- SIDEBAR: SESSIONS & NAVIGATION -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-avatar">
+            <i data-lucide="sparkles" class="brand-icon"></i>
+          </div>
+          <div class="brand-meta">
+            <h2>Trợ lý Doanh nghiệp</h2>
+            <span class="badge-role">AI Assistant</span>
+          </div>
+        </div>
+
+        <!-- NEW CHAT BUTTON -->
+        <button class="btn-new-chat" id="newChatBtn">
+          <i data-lucide="plus" style="width: 17px; height: 17px;"></i>
+          <span>Cuộc trò chuyện mới</span>
+        </button>
+      </div>
+
+      <!-- SESSIONS LIST -->
+      <div class="sessions-section">
+        <div class="section-label">Gần đây</div>
+        <div class="sessions-list" id="sessionsList">
+          <!-- Session items rendered by JS -->
+        </div>
+      </div>
+
+      <!-- SIDEBAR FOOTER: USER-FACING STATUS & ADMIN ACCESS -->
+      <div class="sidebar-footer">
+        <div class="user-status-card">
+          <div class="status-indicator">
+            <span class="status-dot"></span>
+            <span class="status-text">Hệ thống sẵn sàng hỗ trợ</span>
+          </div>
+        </div>
+
+        <div class="footer-actions">
+          <button class="footer-btn btn-admin" id="openAdminHubBtn" title="Quản lý kho tài liệu tham khảo">
+            <i data-lucide="folder-kanban" style="width: 16px; height: 16px;"></i>
+            <span>Kho tài liệu tham khảo</span>
+          </button>
+          <button class="footer-btn btn-settings" id="openSettingsBtn" title="Cài đặt hệ thống">
+            <i data-lucide="sliders-horizontal" style="width: 16px; height: 16px;"></i>
+            <span>Cài đặt</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CHAT CANVAS -->
+    <main class="chat-main">
+      <!-- TOP NAVIGATION BAR -->
+      <header class="chat-header">
+        <div class="header-left">
+          <button class="btn-sidebar-toggle" id="toggleSidebarBtn" title="Thu gọn / Mở rộng thanh bên">
+            <i data-lucide="panel-left" style="width: 18px; height: 18px;"></i>
+          </button>
+          <div class="current-session-title" id="currentSessionTitle">Cuộc trò chuyện mới</div>
+        </div>
+
+        <div class="header-right">
+          <div class="system-ready-pill" id="onlineStatusPill" title="Hệ thống trực tuyến - Nhấp để xem thông tin chịu tải & số người dùng">
+            <span class="pulse-dot"></span>
+            <span class="status-title">Trực tuyến</span>
+            <span class="online-divider">•</span>
+            <span class="online-users-badge">
+              <i data-lucide="users" style="width: 12px; height: 12px; color: var(--accent-emerald);"></i>
+              <strong id="onlineCount">1</strong>
+              <span class="online-subtext">đang dùng</span>
+            </span>
+          </div>
+          <div class="header-actions">
+            <button class="btn-header-action" id="headerAdminBtn" title="Xem danh sách tài liệu tham khảo">
+              <i data-lucide="book-marked" style="width: 14px; height: 14px;"></i>
+              <span>Tài liệu</span>
+            </button>
+            <button class="btn-header-action" id="exportChatBtn" title="Xuất nội dung cuộc trò chuyện thành file Markdown (.md)">
+              <i data-lucide="download" style="width: 14px; height: 14px;"></i>
+              <span>Xuất chat</span>
+            </button>
+            <button class="btn-header-action danger" id="clearChatBtn" title="Xóa toàn bộ tin nhắn đoạn chat này">
+              <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+              <span>Xóa chat</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- MESSAGES DISPLAY AREA -->
+      <div class="chat-messages-container" id="chatMessages">
+        <!-- WELCOME HERO (Shown when chat is empty) -->
+        <div class="welcome-hero" id="welcomeHero">
+          <div class="hero-avatar">
+            <i data-lucide="bot" class="hero-bot-icon"></i>
+          </div>
+          <h1 class="hero-title">Xin chào! Hôm nay tôi có thể hỗ trợ gì cho bạn?</h1>
+          <p class="hero-subtitle">
+            Tôi có thể giúp bạn giải đáp các quy chế nội bộ, tra cứu chính sách phúc lợi, 
+            hoặc hỗ trợ gửi yêu cầu xử lý công việc.
+          </p>
+
+          <!-- 4 USER-FRIENDLY STARTER PROMPT CARDS -->
+          <div class="starter-grid">
+            <div class="starter-card" data-prompt="Quy định làm việc từ xa (Work From Home) của công ty áp dụng cho ai và tối đa bao nhiêu ngày mỗi tuần?">
+              <div class="starter-icon-wrap icon-cyan">
+                <i data-lucide="laptop" class="starter-icon"></i>
+              </div>
+              <div class="starter-content">
+                <h4>Chế độ làm việc từ xa (WFH)</h4>
+                <p>Điều kiện đăng ký, số ngày tối đa và tiêu chuẩn kết nối mạng</p>
+              </div>
+            </div>
+
+            <div class="starter-card" data-prompt="Gói bảo hiểm PTI Care có hạn mức chi trả nội trú và ngoại trú tối đa là bao nhiêu?">
+              <div class="starter-icon-wrap icon-rose">
+                <i data-lucide="heart-pulse" class="starter-icon"></i>
+              </div>
+              <div class="starter-content">
+                <h4>Bảo hiểm Sức khỏe PTI Care</h4>
+                <p>Hạn mức quyền lợi nội trú, ngoại trú và tài trợ người thân</p>
+              </div>
+            </div>
+
+            <div class="starter-card" data-prompt="Tạo giúp tôi một phiếu hỗ trợ: 'Lỗi không truy cập được máy chủ nội bộ', mức độ Khẩn cấp.">
+              <div class="starter-icon-wrap icon-amber">
+                <i data-lucide="life-buoy" class="starter-icon"></i>
+              </div>
+              <div class="starter-content">
+                <h4>Gửi yêu cầu hỗ trợ IT Helpdesk</h4>
+                <p>Tạo phiếu tiếp nhận sự cố kỹ thuật gửi đội ngũ chuyên trách</p>
+              </div>
+            </div>
+
+            <div class="starter-card" data-prompt="Hiện tại là mấy giờ và tính giúp tôi: ngân sách thiết bị 5.000.000 VNĐ cộng thêm 150.000.000 chia đều cho 12 tháng bằng bao nhiêu?">
+              <div class="starter-icon-wrap icon-purple">
+                <i data-lucide="calculator" class="starter-icon"></i>
+              </div>
+              <div class="starter-content">
+                <h4>Tra cứu thời gian & Tính toán</h4>
+                <p>Kiểm tra mốc thời gian thực hoặc thực hiện các phép tính nhanh</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHAT INPUT AREA -->
+      <div class="chat-input-wrapper">
+        <form class="chat-input-form" id="chatForm">
+          <input type="file" id="directAttachInput" accept=".pdf,.txt,.md" style="display:none">
+          <button type="button" class="btn-attach" id="attachFileBtn" title="Nạp nhanh tài liệu vào kho">
+            <i data-lucide="paperclip" style="width: 18px; height: 18px;"></i>
+          </button>
+          <textarea 
+            id="chatInput" 
+            placeholder="Nhập câu hỏi hoặc yêu cầu cần hỗ trợ..." 
+            rows="1"
+          ></textarea>
+          <button type="button" class="stop-btn" id="stopBtn" title="Dừng sinh phản hồi">
+            <i data-lucide="square" style="width: 14px; height: 14px; fill: currentColor;"></i>
+          </button>
+          <button type="submit" class="send-btn" id="sendBtn" title="Gửi tin nhắn">
+            <i data-lucide="arrow-up" style="width: 18px; height: 18px;"></i>
+          </button>
+        </form>
+        <div class="input-tips">
+          <span>Nhấn <b>Enter</b> để gửi, <b>Shift + Enter</b> để xuống dòng</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: KHO TÀI LIỆU & QUẢN LÝ DỮ LIỆU (ADMIN ONLY)       -->
+  <!-- ======================================================== -->
+  <div class="modal-overlay" id="adminHubModal">
+    <div class="modal-container large">
+      <div class="modal-header">
+        <div class="modal-title-with-badge">
+          <i data-lucide="layout-grid" style="width: 20px; height: 20px; color: var(--primary);"></i>
+          <h3>Trung tâm Quản trị AI & Kho Tri thức</h3>
+          <span class="modal-badge-role">Admin Console</span>
+        </div>
+        <button class="modal-close" id="closeAdminHubBtn">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+
+      <!-- 4 COHESIVE ADMIN TABS -->
+      <div class="admin-tab-nav">
+        <button class="admin-tab-btn active" data-admintab="tabKnowledge">
+          <i data-lucide="book-marked" style="width: 15px; height: 15px;"></i>
+          <span>Kho Tri thức (RAG) (<span id="adminDocCount">0</span>)</span>
+        </button>
+        <button class="admin-tab-btn" data-admintab="tabTickets">
+          <i data-lucide="ticket" style="width: 15px; height: 15px;"></i>
+          <span>Phiếu hỗ trợ (<span id="adminTicketCount">0</span>)</span>
+        </button>
+        <button class="admin-tab-btn" data-admintab="tabTools">
+          <i data-lucide="wrench" style="width: 15px; height: 15px;"></i>
+          <span>Kỹ năng tự động</span>
+        </button>
+        <button class="admin-tab-btn" data-admintab="tabBenchmark">
+          <i data-lucide="gauge" style="width: 15px; height: 15px;"></i>
+          <span>Đánh giá AI (Benchmark)</span>
+        </button>
+      </div>
+
+      <div class="modal-body admin-body">
+        <!-- TAB 1: KHO TRI THỨC (UNIFIED UPLOAD + DOCS LIST) -->
+        <div class="admin-pane active" id="tabKnowledge">
+          <!-- QUICK SAMPLE DATA INGESTION -->
+          <div class="sample-data-card">
+            <div class="sample-data-info">
+              <i data-lucide="sparkles" class="sample-icon"></i>
+              <div>
+                <h4>Nạp nhanh bộ dữ liệu mẫu (Quy chế công ty 2024)</h4>
+                <p>Nạp sẵn chính sách làm việc từ xa (WFH), bảo hiểm PTI Care 150tr, trợ cấp thiết bị 5.000.000 VNĐ và SLA kỹ thuật.</p>
+              </div>
+            </div>
+            <button class="btn-sample" id="ingestSampleBtn" type="button">
+              <i data-lucide="database" style="width: 15px; height: 15px;"></i>
+              <span>Nạp dữ liệu mẫu</span>
+            </button>
+          </div>
+
+          <!-- 2-COLUMN SPLIT: LEFT UPLOAD, RIGHT DOCUMENT LIST -->
+          <div class="knowledge-split-grid">
+            <!-- LEFT COLUMN: TẢI LÊN FILE MỚI -->
+            <div class="knowledge-col">
+              <div class="col-header">
+                <div class="col-title">
+                  <i data-lucide="upload-cloud" style="width: 16px; height: 16px; color: var(--primary);"></i>
+                  <span>Tải lên tài liệu mới</span>
+                </div>
+                <span class="col-hint">PDF, TXT, MD</span>
+              </div>
+
+              <div class="upload-dropzone compact" id="dropzone">
+                <input type="file" id="fileInput" accept=".pdf,.txt,.md" style="display:none">
+                <div class="drop-content" id="dropContent">
+                  <i data-lucide="file-up" class="upload-icon-compact"></i>
+                  <p>Kéo thả file vào đây hoặc <a href="javascript:void(0)" id="selectFileLink">chọn file từ máy</a></p>
+                  <small>Tự động phân đoạn tối ưu 600 ký tự • Overlap 120 ký tự</small>
+                </div>
+                <div class="selected-file-name" id="selectedFileName"></div>
+              </div>
+
+              <!-- Tự động áp dụng thông số tối ưu ngầm định -->
+              <input type="hidden" id="chunkSizeInput" value="600">
+              <input type="hidden" id="chunkOverlapInput" value="120">
+              <input type="checkbox" id="contextualHeaderCheck" checked style="display:none">
+
+              <div class="upload-actions-bar">
+                <button class="btn btn-secondary btn-sm" id="previewChunksBtn" disabled>
+                  <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+                  <span>Xem phân đoạn</span>
+                </button>
+                <button class="btn btn-primary btn-sm" id="saveDocBtn" disabled>
+                  <i data-lucide="check" style="width: 14px; height: 14px;"></i>
+                  <span>Lưu vào kho AI</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- RIGHT COLUMN: DANH SÁCH TÀI LIỆU ĐANG KÍCH HOẠT -->
+            <div class="knowledge-col">
+              <div class="col-header">
+                <div class="col-title">
+                  <i data-lucide="database" style="width: 16px; height: 16px; color: var(--accent-emerald);"></i>
+                  <span>Tài liệu đang kích hoạt</span>
+                </div>
+                <button class="btn-icon-subtle" id="refreshDocsBtn" title="Làm mới danh sách tài liệu">
+                  <i data-lucide="rotate-cw" style="width: 14px; height: 14px;"></i>
+                </button>
+              </div>
+
+              <div class="doc-list-compact" id="docList">
+                <div class="empty-state">Đang tải danh sách tài liệu...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: TICKETS MANAGEMENT -->
+        <div class="admin-pane" id="tabTickets">
+          <div class="section-card-header">
+            <div>
+              <h4>Danh sách phiếu yêu cầu hỗ trợ (Support Tickets)</h4>
+              <p>Phiếu sự cố được ghi nhận và phân loại tự động bởi AI Agent qua hội thoại</p>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="refreshTicketsBtn">
+              <i data-lucide="rotate-cw" style="width: 14px; height: 14px;"></i>
+              <span>Làm mới</span>
+            </button>
+          </div>
+          <div class="tickets-table-wrap">
+            <table class="tickets-table">
+              <thead>
+                <tr>
+                  <th style="width: 110px;">Mã phiếu</th>
+                  <th>Tiêu đề yêu cầu</th>
+                  <th style="width: 120px;">Mức độ</th>
+                  <th style="width: 130px;">Trạng thái</th>
+                  <th style="width: 150px;">Thời gian tạo</th>
+                </tr>
+              </thead>
+              <tbody id="ticketsList">
+                <tr>
+                  <td colspan="5" style="text-align:center; padding: 32px; color: var(--text-muted);">
+                    Chưa có phiếu hỗ trợ nào. Thử nhắn cho AI: <i>"Tạo giúp tôi phiếu hỗ trợ sự cố máy chủ mức Khẩn cấp"</i>.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 3: TOOLS REGISTRY -->
+        <div class="admin-pane" id="tabTools">
+          <div class="section-card-header">
+            <div>
+              <h4>Bộ công cụ tự động của AI Agent (Function Calling)</h4>
+              <p>Các năng lực trợ lý tự động nhận diện ý định và kích hoạt trong thời gian thực</p>
+            </div>
+            <span class="active-tools-pill">
+              <span class="pulse-dot-sm"></span> 5 công cụ sẵn sàng
+            </span>
+          </div>
+          <div class="tools-grid">
+            <div class="tool-card">
+              <div class="tool-header">
+                <div class="tool-icon-wrap icon-cyan">
+                  <i data-lucide="book-open"></i>
+                </div>
+                <div>
+                  <h4>Tra cứu tài liệu (RAG)</h4>
+                  <span class="tool-badge">pgvector • HNSW</span>
+                </div>
+              </div>
+              <p>Tự động tìm kiếm đoạn văn liên quan nhất trong các tài liệu nội bộ đã nạp để trả lời chính xác và dẫn nguồn trích dẫn.</p>
+            </div>
+            <div class="tool-card">
+              <div class="tool-header">
+                <div class="tool-icon-wrap icon-emerald">
+                  <i data-lucide="clock"></i>
+                </div>
+                <div>
+                  <h4>Thời gian thực</h4>
+                  <span class="tool-badge">UTC+7 Việt Nam</span>
+                </div>
+              </div>
+              <p>Cung cấp ngày, giờ, thứ trong tuần theo giờ thực tế cho các câu hỏi cần mốc thời gian (như hạn nộp, lịch làm việc, quy định).</p>
+            </div>
+            <div class="tool-card">
+              <div class="tool-header">
+                <div class="tool-icon-wrap icon-amber">
+                  <i data-lucide="ticket"></i>
+                </div>
+                <div>
+                  <h4>Tạo phiếu hỗ trợ IT</h4>
+                  <span class="tool-badge">Ticketing Workflow</span>
+                </div>
+              </div>
+              <p>Tự động trích xuất thông tin sự cố, gán mức độ ưu tiên ('Khẩn cấp', 'Bình thường', 'Thấp') và mở phiếu hỗ trợ kỹ thuật.</p>
+            </div>
+            <div class="tool-card">
+              <div class="tool-header">
+                <div class="tool-icon-wrap icon-purple">
+                  <i data-lucide="search"></i>
+                </div>
+                <div>
+                  <h4>Tra cứu phiếu hỗ trợ</h4>
+                  <span class="tool-badge">Ticket Lookup</span>
+                </div>
+              </div>
+              <p>Tra cứu tình trạng xử lý và nội dung chi tiết của phiếu hỗ trợ theo mã định danh (ví dụ: TK-10293).</p>
+            </div>
+            <div class="tool-card">
+              <div class="tool-header">
+                <div class="tool-icon-wrap icon-rose">
+                  <i data-lucide="calculator"></i>
+                </div>
+                <div>
+                  <h4>Tính toán số học</h4>
+                  <span class="tool-badge">Math & Finance</span>
+                </div>
+              </div>
+              <p>Thực hiện các phép tính số học, phần trăm, công thức tài chính và trợ cấp với độ chính xác tuyệt đối, tránh lỗi tính nhẩm của LLM.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: AI ACCURACY BENCHMARK & EVALUATION -->
+        <div class="admin-pane" id="tabBenchmark">
+          <div class="benchmark-header">
+            <div>
+              <h4>Đánh giá độ chính xác AI (14 Ca kiểm thử chuyên sâu)</h4>
+              <p>Kiểm thử tự động End-to-End: Truy vấn pgvector, gọi Tools, so khớp dữ kiện và đo lường chống ảo giác.</p>
+            </div>
+            <button class="btn btn-primary" id="runBenchmarkBtn">
+              <i data-lucide="play" style="width: 15px; height: 15px;"></i>
+              <span>Chạy lại kiểm thử</span>
+            </button>
+          </div>
+
+          <!-- 4 METRIC CARDS -->
+          <div class="benchmark-stats-grid">
+            <div class="bm-stat-card">
+              <span class="bm-stat-label">Độ chính xác (Accuracy)</span>
+              <div class="bm-stat-val text-emerald" id="bmAccuracy">100%</div>
+              <span class="bm-stat-sub" id="bmPassedCount">14 / 14 ca ĐẠT</span>
+            </div>
+            <div class="bm-stat-card">
+              <span class="bm-stat-label">Chống ảo giác (Faithfulness)</span>
+              <div class="bm-stat-val text-cyan" id="bmFaithfulness">100%</div>
+              <span class="bm-stat-sub">Không bịa đặt thông tin</span>
+            </div>
+            <div class="bm-stat-card">
+              <span class="bm-stat-label">Độ trễ TB (Latency)</span>
+              <div class="bm-stat-val text-purple" id="bmLatency">4.7s</div>
+              <span class="bm-stat-sub">Suy luận & RAG song song</span>
+            </div>
+            <div class="bm-stat-card">
+              <span class="bm-stat-label">Thời điểm chạy</span>
+              <div class="bm-stat-val text-amber" id="bmLastRun" style="font-size: 0.92rem; line-height: 1.8;">Vừa xong</div>
+              <span class="bm-stat-sub">Chấm điểm tự động</span>
+            </div>
+          </div>
+
+          <!-- DETAILED TEST CASES LIST -->
+          <div class="benchmark-results-wrap">
+            <div class="benchmark-results-list" id="benchmarkResultsList">
+              <div class="empty-state">Đang tải kết quả kiểm thử gần nhất...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer compact">
+        <div class="modal-footer-status">
+          <span class="status-indicator-dot"></span>
+          <span>pgvector • HNSW Index Active • Google Gemini 2.5 Flash</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="closeAdminHubFooterBtn">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PREVIEW CHUNKS -->
+  <div class="modal-overlay" id="previewModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title-with-badge">
+          <i data-lucide="file-search" style="width: 20px; height: 20px; color: var(--primary);"></i>
+          <h3>Xem trước kết quả phân đoạn văn bản</h3>
+        </div>
+        <button class="modal-close" id="closePreviewBtn">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="preview-stats" id="previewStats"></div>
+        <div class="preview-chunks-list" id="previewChunksList"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancelPreviewBtn">Đóng</button>
+        <button class="btn btn-primary" id="confirmIngestBtn">Xác nhận lưu vào kho</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SETTINGS -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal-container small">
+      <div class="modal-header">
+        <div class="modal-title-with-badge">
+          <i data-lucide="settings" style="width: 18px; height: 18px; color: var(--primary);"></i>
+          <h3>Cài đặt Hệ thống</h3>
+        </div>
+        <button class="modal-close" id="closeSettingsBtn">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="settingsForm">
+          <div class="form-group">
+            <label for="selectProvider">Nhà cung cấp Mô hình AI:</label>
+            <select id="selectProvider" class="form-control">
+              <option value="gemini">Google Gemini (Khuyên dùng - Nhanh & Mượt mà)</option>
+              <option value="openai">OpenAI (GPT-4o / GPT-4o-mini)</option>
+            </select>
+          </div>
+          <div class="form-group" id="geminiKeyGroup">
+            <label for="geminiKeyInput">Khóa API Google Gemini:</label>
+            <input type="password" id="geminiKeyInput" class="form-control" placeholder="AIzaSy...">
+            <small>Lấy key miễn phí tại <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a></small>
+          </div>
+          <div class="form-group" id="openaiKeyGroup" style="display:none">
+            <label for="openaiKeyInput">Khóa API OpenAI:</label>
+            <input type="password" id="openaiKeyInput" class="form-control" placeholder="sk-...">
+          </div>
+          <div class="form-group">
+            <label for="selectEmbedding">Mô hình Tạo Vector (Embedding):</label>
+            <select id="selectEmbedding" class="form-control">
+              <option value="gemini">Google gemini-embedding-001</option>
+              <option value="openai">OpenAI text-embedding-3-small</option>
+              <option value="local">Local Offline (all-MiniLM-L6-v2)</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancelSettingsBtn">Hủy</button>
+        <button class="btn btn-primary" id="saveSettingsBtn">Lưu Cài đặt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <script src="/static/app.js?v=4.1"></script>
+</body>
+</html>

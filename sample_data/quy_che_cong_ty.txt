@@ -1,0 +1,20 @@
+QUY CHẾ HOẠT ĐỘNG VÀ CHÍNH SÁCH NHÂN SỰ NĂM 2024
+
+Chương I: QUY ĐỊNH LÀM VIỆC TỪ XA (WORK FROM HOME - WFH)
+Điều 1: Đối tượng và điều kiện áp dụng
+Tất cả nhân viên chính thức đã vượt qua thời gian thử việc 02 tháng đều được quyền đăng ký chế độ làm việc từ xa (WFH).
+Mỗi nhân viên được phép đăng ký tối đa 02 ngày WFH trong mỗi tuần làm việc. Các ngày WFH không được trùng vào ngày diễn ra cuộc họp toàn thể công ty (sáng Thứ Hai) và phải được sự phê duyệt trước 24 giờ của Trưởng bộ phận phụ trách.
+
+Điều 2: Tiêu chuẩn khi làm việc từ xa
+Trong thời gian WFH, nhân viên bắt buộc phải online trên hệ thống Slack nội bộ từ 08:30 đến 17:30, phản hồi tin nhắn công việc trong vòng tối đa 30 phút. Nhân viên cần đảm bảo tốc độ đường truyền internet tối thiểu 50 Mbps để phục vụ các cuộc họp trực tuyến.
+
+Chương II: CHÍNH SÁCH BẢO HIỂM VÀ PHÚC LỢI SỨC KHỎE
+Điều 3: Gói bảo hiểm sức khỏe cao cấp
+Ngoài bảo hiểm y tế bắt buộc theo luật lao động, công ty cung cấp gói bảo hiểm sức khỏe toàn diện PTI Care cho toàn thể nhân viên ký hợp đồng chính thức từ 06 tháng trở lên. Hạn mức chi trả nội trú tối đa là 150.000.000 VNĐ/năm, và ngoại trú tối đa là 20.000.000 VNĐ/năm. Nhân viên làm việc từ 02 năm trở lên sẽ được công ty tài trợ thêm 50% chi phí mua bảo hiểm cho người thân (vợ/chồng hoặc con).
+
+Điều 4: Trợ cấp thiết bị làm việc
+Mỗi nhân sự mới gia nhập sẽ được cấp ngân sách một lần trị giá 5.000.000 VNĐ để trang bị màn hình phụ, bàn phím cơ hoặc ghế công thái học làm việc tại nhà. Thiết bị sẽ thuộc quyền sở hữu của nhân viên sau khi hoàn thành 01 năm làm việc tại công ty.
+
+Chương III: QUY TRÌNH HỖ TRỢ KỸ THUẬT VÀ TIẾP NHẬN YÊU CẦU
+Điều 5: Báo cáo sự cố hệ thống
+Mọi sự cố liên quan đến hệ thống máy chủ, mạng nội bộ, tài khoản ERP hoặc cấp quyền truy cập cơ sở dữ liệu đều phải được gửi qua hệ thống Ticket hỗ trợ với tiêu đề rõ ràng và chọn đúng mức độ ưu tiên ('Thấp', 'Bình thường', 'Khẩn cấp'). Bộ phận IT Helpdesk cam kết thời gian phản hồi ban đầu trong vòng 15 phút đối với các sự cố Khẩn cấp.
