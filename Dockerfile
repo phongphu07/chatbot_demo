@@ -19,5 +19,5 @@ COPY . .
 # Expose port ứng dụng
 EXPOSE 8000
 
-# Chạy ứng dụng FastAPI bằng Uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Chạy ứng dụng FastAPI bằng Uvicorn (tự động nhận cổng $PORT trên Render/Cloud hoặc 8000)
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
