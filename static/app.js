@@ -1000,6 +1000,7 @@ function setupAdminHub() {
         targetPane.classList.add("active");
         refreshIcons(targetPane);
       }
+      btn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
     });
   });
 
@@ -1351,12 +1352,14 @@ function setupEventListeners() {
 
   setupCustomSelects();
 
-  openSettingsBtn.addEventListener("click", async () => {
+  openSettingsBtn.addEventListener("click", () => {
     closeMobileSidebar();
-    try {
-      const res = await fetch("/api/settings/status");
-      if (res.ok) {
-        const data = await res.json();
+    settingsModal.classList.add("active");
+    // Fetch settings status in the background without delaying modal display
+    fetch("/api/settings/status")
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (!data) return;
         if (data.llm_provider) {
           selectProvider.value = data.llm_provider;
           selectProvider.dispatchEvent(new Event("change"));
@@ -1370,10 +1373,27 @@ function setupEventListeners() {
         } else {
           geminiKeyInput.placeholder = "Dán mã AIzaSy... vào đây";
         }
-      }
-    } catch(e){}
-    settingsModal.classList.add("active");
+      })
+      .catch(() => {});
   });
+
+  // Ensure all footer buttons in mobile sidebar close the drawer immediately
+  document.querySelectorAll(".sidebar-footer .footer-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      closeMobileSidebar();
+    });
+  });
+
+  // Tap outside any modal container to immediately close the modal (native sheet behavior)
+  document.querySelectorAll(".modal-overlay").forEach(overlay => {
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) {
+        overlay.classList.remove("active");
+        document.querySelectorAll(".custom-select-wrapper").forEach(w => w.classList.remove("open"));
+      }
+    });
+  });
+
   closeSettingsBtn.addEventListener("click", () => {
     settingsModal.classList.remove("active");
     document.querySelectorAll(".custom-select-wrapper").forEach(w => w.classList.remove("open"));

@@ -13,7 +13,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <!-- Lucide Professional Icons Library -->
   <script src="/static/lucide.min.js"></script>
-  <link rel="stylesheet" href="/static/style.css?v=4.1">
+  <link rel="stylesheet" href="/static/style.css?v=5.0">
 </head>
 <body>
   <div class="app-layout">
@@ -268,7 +268,7 @@
                 <input type="file" id="fileInput" accept=".pdf,.txt,.md" style="display:none">
                 <div class="drop-content" id="dropContent">
                   <i data-lucide="file-up" class="upload-icon-compact"></i>
-                  <p>Kéo thả file vào đây hoặc <a href="javascript:void(0)" id="selectFileLink">chọn file từ máy</a></p>
+                  <p><span class="desktop-only-inline">Kéo thả file vào đây hoặc </span><a href="javascript:void(0)" id="selectFileLink"><span class="mobile-only-inline">Chạm để </span>chọn file từ máy</a></p>
                   <small>Tự động phân đoạn tối ưu 600 ký tự • Overlap 120 ký tự</small>
                 </div>
                 <div class="selected-file-name" id="selectedFileName"></div>
@@ -632,6 +632,6 @@
   <!-- Toast Notification -->
   <div class="toast" id="toast"></div>
 
-  <script src="/static/app.js?v=4.1"></script>
+  <script src="/static/app.js?v=5.0"></script>
 </body>
 </html>
