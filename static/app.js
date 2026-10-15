@@ -1254,7 +1254,22 @@ function setupEventListeners() {
   closePreviewBtn.addEventListener("click", () => previewModal.classList.remove("active"));
   cancelPreviewBtn.addEventListener("click", () => previewModal.classList.remove("active"));
 
-  openSettingsBtn.addEventListener("click", () => settingsModal.classList.add("active"));
+  openSettingsBtn.addEventListener("click", async () => {
+    try {
+      const res = await fetch("/api/settings/status");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.llm_provider) selectProvider.value = data.llm_provider;
+        if (data.embedding_provider) selectEmbedding.value = data.embedding_provider;
+        if (data.has_gemini_key) {
+          geminiKeyInput.placeholder = "•••••••••••••••••••• (Đã cấu hình sẵn)";
+        } else {
+          geminiKeyInput.placeholder = "Dán mã AIzaSy... vào đây";
+        }
+      }
+    } catch(e){}
+    settingsModal.classList.add("active");
+  });
   closeSettingsBtn.addEventListener("click", () => settingsModal.classList.remove("active"));
   cancelSettingsBtn.addEventListener("click", () => settingsModal.classList.remove("active"));
 
@@ -1283,8 +1298,10 @@ function setupEventListeners() {
         body: JSON.stringify(payload)
       });
       const data = await res.json();
-      showToast(data.message || "Đã lưu cài đặt!", "success");
+      showToast(data.message || "Đã lưu cài đặt & kích hoạt API Key!", "success");
       settingsModal.classList.remove("active");
+      geminiKeyInput.value = "";
+      openaiKeyInput.value = "";
     } catch (err) {
       showToast("Lỗi lưu cấu hình: " + err.message, "error");
     }

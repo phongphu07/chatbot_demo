@@ -379,23 +379,66 @@ async def list_tools():
         })
     return {"tools": tools_info}
 
+@app.get("/api/settings/status")
+async def get_settings_status():
+    """Kiểm tra trạng thái cấu hình hệ thống mà không làm lộ API Key"""
+    return {
+        "llm_provider": settings.LLM_PROVIDER,
+        "has_gemini_key": bool(settings.GEMINI_API_KEY and settings.GEMINI_API_KEY.strip()),
+        "has_openai_key": bool(settings.OPENAI_API_KEY and settings.OPENAI_API_KEY.strip()),
+        "embedding_provider": settings.EMBEDDING_PROVIDER
+    }
+
 @app.post("/api/settings")
 async def update_settings(req: ConfigUpdateRequest):
-    """Cập nhật nhanh API Key hoặc Provider vào file .env"""
+    """Cập nhật nhanh API Key hoặc Provider vào file .env và nạp nóng trực tiếp vào RAM"""
     env_file = BASE_DIR / ".env"
     if not env_file.exists():
-        env_file.touch()
+        try:
+            env_file.touch()
+        except Exception:
+            pass
 
     if req.llm_provider:
-        set_key(str(env_file), "LLM_PROVIDER", req.llm_provider)
-    if req.gemini_api_key is not None and req.gemini_api_key.strip():
-        set_key(str(env_file), "GEMINI_API_KEY", req.gemini_api_key.strip())
-    if req.openai_api_key is not None and req.openai_api_key.strip():
-        set_key(str(env_file), "OPENAI_API_KEY", req.openai_api_key.strip())
-    if req.embedding_provider:
-        set_key(str(env_file), "EMBEDDING_PROVIDER", req.embedding_provider)
+        try:
+            set_key(str(env_file), "LLM_PROVIDER", req.llm_provider)
+        except Exception:
+            pass
+        settings.LLM_PROVIDER = req.llm_provider
 
-    return {"status": "success", "message": "Đã lưu cài đặt thành công!"}
+    if req.gemini_api_key is not None and req.gemini_api_key.strip():
+        val = req.gemini_api_key.strip()
+        try:
+            set_key(str(env_file), "GEMINI_API_KEY", val)
+        except Exception:
+            pass
+        settings.GEMINI_API_KEY = val
+        os.environ["GEMINI_API_KEY"] = val
+
+    if req.openai_api_key is not None and req.openai_api_key.strip():
+        val = req.openai_api_key.strip()
+        try:
+            set_key(str(env_file), "OPENAI_API_KEY", val)
+        except Exception:
+            pass
+        settings.OPENAI_API_KEY = val
+        os.environ["OPENAI_API_KEY"] = val
+
+    if req.embedding_provider:
+        try:
+            set_key(str(env_file), "EMBEDDING_PROVIDER", req.embedding_provider)
+        except Exception:
+            pass
+        settings.EMBEDDING_PROVIDER = req.embedding_provider
+
+    # Nạp nóng lại AI Agent để client nhận API Key mới ngay tức khắc mà không cần khởi động lại
+    try:
+        from app.agent import ai_agent
+        ai_agent._init_client()
+    except Exception as e:
+        logger.error(f"Lỗi khi re-init AI Agent: {e}")
+
+    return {"status": "success", "message": "Đã lưu cài đặt và kích hoạt API Key thành công!"}
 
 # Phục vụ thư mục static
 if STATIC_DIR.exists():
