@@ -13,10 +13,17 @@ let currentAbortController = null;
 
 // DOM Elements - Sidebar & Sessions
 const sidebar = document.getElementById("sidebar");
+const sidebarBackdrop = document.getElementById("sidebarBackdrop");
+const closeSidebarBtn = document.getElementById("closeSidebarBtn");
 const toggleSidebarBtn = document.getElementById("toggleSidebarBtn");
 const newChatBtn = document.getElementById("newChatBtn");
 const sessionsList = document.getElementById("sessionsList");
 const currentSessionTitle = document.getElementById("currentSessionTitle");
+
+function closeMobileSidebar() {
+  if (sidebar) sidebar.classList.remove("open");
+  if (sidebarBackdrop) sidebarBackdrop.classList.remove("active");
+}
 
 // DOM Elements - Main Chat
 const chatMessages = document.getElementById("chatMessages");
@@ -198,6 +205,9 @@ function renderSessionsList() {
         currentSessionId = id;
         renderSessionsList();
         renderCurrentSessionMessages();
+      }
+      if (window.innerWidth <= 860) {
+        closeMobileSidebar();
       }
     });
   });
@@ -1278,10 +1288,24 @@ async function handleSaveDocument() {
 function setupEventListeners() {
   toggleSidebarBtn.addEventListener("click", () => {
     sidebar.classList.toggle("open");
+    if (sidebarBackdrop) {
+      sidebarBackdrop.classList.toggle("active", sidebar.classList.contains("open"));
+    }
   });
+
+  if (closeSidebarBtn) {
+    closeSidebarBtn.addEventListener("click", closeMobileSidebar);
+  }
+
+  if (sidebarBackdrop) {
+    sidebarBackdrop.addEventListener("click", closeMobileSidebar);
+  }
 
   newChatBtn.addEventListener("click", () => {
     createNewSession(true);
+    if (window.innerWidth <= 860) {
+      closeMobileSidebar();
+    }
   });
 
   // Stop Generation button

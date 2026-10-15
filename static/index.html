@@ -17,17 +17,25 @@
 </head>
 <body>
   <div class="app-layout">
+    <!-- MOBILE SIDEBAR BACKDROP -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
     <!-- SIDEBAR: SESSIONS & NAVIGATION -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <div class="brand">
-          <div class="brand-avatar">
-            <i data-lucide="sparkles" class="brand-icon"></i>
+        <div class="sidebar-brand-row">
+          <div class="brand">
+            <div class="brand-avatar">
+              <i data-lucide="sparkles" class="brand-icon"></i>
+            </div>
+            <div class="brand-meta">
+              <h2>Trợ lý Doanh nghiệp</h2>
+              <span class="badge-role">AI Assistant</span>
+            </div>
           </div>
-          <div class="brand-meta">
-            <h2>Trợ lý Doanh nghiệp</h2>
-            <span class="badge-role">AI Assistant</span>
-          </div>
+          <button class="btn-sidebar-close" id="closeSidebarBtn" title="Đóng thanh bên">
+            <i data-lucide="x" style="width: 17px; height: 17px;"></i>
+          </button>
         </div>
 
         <!-- NEW CHAT BUTTON -->
