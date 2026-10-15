@@ -478,10 +478,52 @@ async function handleChatSubmit(e) {
             scrollToBottom();
           }
 
-          // Event 4: Error
+          // Event 4: Key Required
+          else if (event.type === "key_required") {
+            const cardHtml = `
+              <div class="system-alert-card key-required-card">
+                <div class="alert-card-header">
+                  <i data-lucide="key-round" class="alert-icon"></i>
+                  <span class="alert-card-title">${escapeHtml(event.title || "Yêu cầu cấu hình API Key")}</span>
+                </div>
+                <div class="alert-card-body">
+                  <p class="alert-card-text">${escapeHtml(event.message)}</p>
+                  <button type="button" class="btn-alert-action" onclick="document.getElementById('openSettingsBtn').click()">
+                    <i data-lucide="sliders-horizontal"></i>
+                    <span>Cấu hình API Key</span>
+                  </button>
+                </div>
+              </div>
+            `;
+            const textContent = assistantBubble.querySelector(".text-content");
+            textContent.innerHTML = cardHtml;
+            refreshIcons();
+            scrollToBottom();
+            cur.messages.push({
+              role: "assistant",
+              content: `[Thông báo hệ thống: ${event.message}]`
+            });
+            saveSessions();
+            return;
+          }
+
+          // Event 5: General Error
           else if (event.type === "error") {
-            accumulatedContent += `\n\n> ⚠️ **Thông báo:** ${event.content}`;
-            updateAssistantText(assistantBubble, accumulatedContent);
+            const cardHtml = `
+              <div class="system-alert-card error-card">
+                <div class="alert-card-header">
+                  <i data-lucide="alert-circle" class="alert-icon"></i>
+                  <span class="alert-card-title">Thông báo hệ thống</span>
+                </div>
+                <div class="alert-card-body">
+                  <p class="alert-card-text">${escapeHtml(event.content)}</p>
+                </div>
+              </div>
+            `;
+            const textContent = assistantBubble.querySelector(".text-content");
+            textContent.innerHTML = cardHtml;
+            refreshIcons();
+            scrollToBottom();
           }
         } catch (parseErr) {
           console.error("Lỗi parse SSE:", parseErr);
@@ -503,7 +545,20 @@ async function handleChatSubmit(e) {
         saveSessions();
       }
     } else {
-      updateAssistantText(assistantBubble, `> ⚠️ **Lỗi kết nối:** ${err.message}. Hãy chắc chắn máy chủ đang chạy.`);
+      const connErrHtml = `
+        <div class="system-alert-card error-card">
+          <div class="alert-card-header">
+            <i data-lucide="wifi-off" class="alert-icon"></i>
+            <span class="alert-card-title">Lỗi kết nối</span>
+          </div>
+          <div class="alert-card-body">
+            <p class="alert-card-text">${escapeHtml(err.message)}. Vui lòng kiểm tra lại kết nối mạng hoặc trạng thái máy chủ.</p>
+          </div>
+        </div>
+      `;
+      const textContent = assistantBubble.querySelector(".text-content");
+      textContent.innerHTML = connErrHtml;
+      refreshIcons();
     }
   } finally {
     currentAbortController = null;
@@ -1253,6 +1308,15 @@ function setupEventListeners() {
 
   closePreviewBtn.addEventListener("click", () => previewModal.classList.remove("active"));
   cancelPreviewBtn.addEventListener("click", () => previewModal.classList.remove("active"));
+
+  // Click on in-chat action link [⚙️ Mở Cài đặt tại đây](#open-settings)
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest("a[href='#open-settings']");
+    if (link) {
+      e.preventDefault();
+      openSettingsBtn.click();
+    }
+  });
 
   openSettingsBtn.addEventListener("click", async () => {
     try {

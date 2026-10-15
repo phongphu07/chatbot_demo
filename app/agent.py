@@ -152,8 +152,9 @@ class AIAgent:
         self._init_client()
         if not self.client:
             yield json.dumps({
-                "type": "error",
-                "content": f"Chưa cấu hình API Key cho provider '{settings.LLM_PROVIDER}'. Vui lòng thêm key vào file .env!"
+                "type": "key_required",
+                "title": "Yêu cầu cấu hình API Key",
+                "message": f"Hệ thống chưa được thiết lập API Key để kết nối mô hình {settings.LLM_PROVIDER.capitalize()}. Vui lòng cấu hình khóa truy cập để bắt đầu sử dụng trợ lý AI."
             })
             return
 
