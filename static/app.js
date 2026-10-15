@@ -1297,6 +1297,15 @@ function setupEventListeners() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
+      if (!res.ok) {
+        const text = await res.text();
+        let errMsg = "Lỗi máy chủ (" + res.status + ")";
+        try {
+          const errJson = JSON.parse(text);
+          errMsg = errJson.detail || errJson.message || errMsg;
+        } catch(e) {}
+        throw new Error(errMsg);
+      }
       const data = await res.json();
       showToast(data.message || "Đã lưu cài đặt & kích hoạt API Key!", "success");
       settingsModal.classList.remove("active");

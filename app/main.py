@@ -2,6 +2,7 @@ import os
 import shutil
 import json
 import asyncio
+import logging
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, WebSocket, WebSocketDisconnect
@@ -9,6 +10,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse, FileResponse
 from pydantic import BaseModel
 from dotenv import set_key
+
+logger = logging.getLogger(__name__)
 
 from app.config import settings, BASE_DIR
 from app.chunker import TextChunker

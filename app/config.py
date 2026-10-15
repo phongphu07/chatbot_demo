@@ -5,7 +5,9 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 def reload_env():
-    load_dotenv(BASE_DIR / ".env", override=True)
+    env_file = BASE_DIR / ".env"
+    if env_file.exists():
+        load_dotenv(env_file, override=False)
 
 class Settings:
     PROJECT_NAME: str = "Multi-Purpose AI Assistant (3-in-1)"
@@ -16,15 +18,30 @@ class Settings:
         reload_env()
         return os.getenv("LLM_PROVIDER", "gemini").lower()
     
+    @LLM_PROVIDER.setter
+    def LLM_PROVIDER(self, val: str):
+        if val:
+            os.environ["LLM_PROVIDER"] = val.lower()
+    
     @property
     def GEMINI_API_KEY(self) -> str:
         reload_env()
         return os.getenv("GEMINI_API_KEY", "").strip()
     
+    @GEMINI_API_KEY.setter
+    def GEMINI_API_KEY(self, val: str):
+        if val is not None:
+            os.environ["GEMINI_API_KEY"] = val.strip()
+    
     @property
     def OPENAI_API_KEY(self) -> str:
         reload_env()
         return os.getenv("OPENAI_API_KEY", "").strip()
+    
+    @OPENAI_API_KEY.setter
+    def OPENAI_API_KEY(self, val: str):
+        if val is not None:
+            os.environ["OPENAI_API_KEY"] = val.strip()
     
     @property
     def GEMINI_MODEL(self) -> str:
@@ -40,6 +57,11 @@ class Settings:
     def EMBEDDING_PROVIDER(self) -> str:
         reload_env()
         return os.getenv("EMBEDDING_PROVIDER", "gemini").lower()
+    
+    @EMBEDDING_PROVIDER.setter
+    def EMBEDDING_PROVIDER(self, val: str):
+        if val:
+            os.environ["EMBEDDING_PROVIDER"] = val.lower()
     
     # Dimensions mapping
     EMBEDDING_DIMENSIONS = {
